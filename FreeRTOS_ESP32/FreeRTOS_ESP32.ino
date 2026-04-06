@@ -106,7 +106,7 @@ void FileIOTask(void *pvParameters) {
 }
 
 //Gets the time and then yields the cpu, gets the time again when it next runs, records the time elapsed, then sleeps for 1us
-void ContextSwitchTask(void *pvParameters) {
+void CTX_Task_A(void *pvParameters) {
   while (1) {
     int64_t t1 = esp_timer_get_time();
     taskYIELD();
@@ -117,6 +117,13 @@ void ContextSwitchTask(void *pvParameters) {
 
     vTaskDelay(pdMS_TO_TICKS(1));
   }
+}
+
+void CTX_Task_B(void *pvParameters) {
+    while (1) {
+        taskYIELD();
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
 }
 
 //Prints the boot time, heap stats, current ISR timestamp, average execution times of tasks, CPU usage stats, and then sleeps for 5 seconds
@@ -186,7 +193,8 @@ void setup() {
   //Create RTOS tasks
   xTaskCreatePinnedToCore(Light_Task, "Light_Task", 2048, NULL, 1, NULL, 0);
   xTaskCreatePinnedToCore(Heavy_Task, "Heavy_Task", 2048, NULL, 1, NULL, 0);
-  xTaskCreatePinnedToCore(ContextSwitchTask, "Ctx", 2048, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(CTX_Task_A, "CTX_A", 2048, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(CTX_Task_B, "CTX_B", 2048, NULL, 2, NULL, 1);
   xTaskCreatePinnedToCore(MetricsTask, "Metrics", 4096, NULL, 1, NULL, 1);
   xTaskCreatePinnedToCore(IoTTask, "IoT", 2048, NULL, 1, NULL, 0);
   xTaskCreatePinnedToCore(FileIOTask, "FileIO", 4096, NULL, 1, NULL, 1);
