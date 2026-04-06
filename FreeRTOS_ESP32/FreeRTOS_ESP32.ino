@@ -14,7 +14,6 @@ volatile int64_t heavy_times[NUM_SAMPLES];
 volatile int64_t task_iot_times[NUM_SAMPLES];
 volatile int64_t file_write_times[NUM_SAMPLES];
 volatile int64_t ctx_switch_times[NUM_SAMPLES];
-volatile int64_t isr_latency_samples[NUM_SAMPLES];
 
 //Record current sample index for each list
 volatile int sample_light = 0;
@@ -22,7 +21,6 @@ volatile int sample_heavy = 0;
 volatile int sample_iot = 0;
 volatile int sample_write = 0;
 volatile int sample_ctx = 0;
-volatile int sample_isr = 0;
 
 //Record interrupt timestamp
 volatile int64_t last_isr_time = 0;
@@ -30,13 +28,9 @@ volatile int64_t last_isr_time = 0;
 //Initialize pointer to hardware timer
 hw_timer_t *timer = NULL;
 
-//Runs during timer interrupt, gets the time and adds that time to the interrupt time list
+//Runs during timer interrupt, gets the time
 void IRAM_ATTR onTimer() {
   last_isr_time = esp_timer_get_time();
-
-  if (sample_isr < NUM_SAMPLES) {
-    isr_latency_samples[sample_isr++] = last_isr_time;
-  }
 }
 
 //Records how long 1000 interations takes, records the time in light_times and then sleeps for 1us
@@ -92,7 +86,6 @@ void FileIOTask(void *pvParameters) {
     File file = SPIFFS.open("/test.txt", FILE_WRITE, true);
     if (!file) {
       Serial.println("File open failed");
-      vTaskDelay(pdMS_TO_TICKS(1000));
       continue;
     }
 
