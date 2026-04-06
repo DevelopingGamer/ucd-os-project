@@ -86,6 +86,7 @@ void FileIOTask(void *pvParameters) {
     File file = SPIFFS.open("/test.txt", FILE_WRITE, true);
     if (!file) {
       Serial.println("File open failed");
+      vTaskDelay(pdMS_TO_TICKS(1000));
       continue;
     }
 
