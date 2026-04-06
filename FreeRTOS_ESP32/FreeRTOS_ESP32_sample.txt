@@ -1,29 +1,29 @@
 ===== BENCHMARK RESULTS =====
-Boot time: 69726 us
-Free heap: 193752 bytes (76.14%)
-Heap in use: 60720 bytes (23.86%)
-Last ISR time: 177114738 us
-Light_Task avg: 200 us
-Heavy_Task avg: 94679 us
-IoT avg: 484 us
-File write avg: 270753 us
+Boot time: 69099 us
+Free heap: 202320 bytes (77.06%)
+Heap in use: 60240 bytes (22.94%)
+Last ISR time: 101101440 us
+Light_Task avg: 197 us
+Heavy_Task avg: 94915 us
+IoT avg: 537 us
+File write avg: 280840 us
 Context switch avg: 5 us
 =============================
 
 
 ========= CPU USAGE =========
-Heavy_Task     	157753349		88%
-Metrics        	118569		<1%
-loopTask       	163967025		92%
-IDLE0          	781150		<1%
-IDLE1          	6233		<1%
-Ctx            	2835110		1%
-IoT            	2571891		1%
-FileIO         	10447325		5%
-Light_Task     	8950951		5%
+Heavy_Task     	89863997		88%
+Metrics        	67403		<1%
+loopTask       	93405538		92%
+IDLE0          	451504		<1%
+IDLE1          	1762		<1%
+Ctx            	1617027		1%
+IoT            	1476746		1%
+FileIO         	6307344		6%
+Light_Task     	5100332		5%
 esp_timer      	21		<1%
-ipc0           	7340199		4%
+ipc0           	4534240		4%
 Tmr Svc        	22		<1%
-ipc1           	39515		<1%
+ipc1           	30697		<1%
 
 =============================
