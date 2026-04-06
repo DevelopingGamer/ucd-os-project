@@ -1,0 +1,9 @@
+===== BENCHMARK RESULTS =====
+Boot time: 117200 us
+Last ISR time: 237117200 us
+Light_Task avg: 85 us
+Heavy_Task avg: 82011 us
+IoT avg: 382 us
+File write avg: 150380 us
+Context switch avg: 0 us
+=============================
