@@ -275,6 +275,8 @@ static void hf_irq_stress_run(void) {
     ztimer_sleep(ZTIMER_MSEC, HF_IRQ_DURATION_MS);
     //Stop hardware timer 2 after the test
     timer_stop(TIMER_DEV(2));
+    //Set the interrupt miss counter to 0
+    _hf_irq_miss = 0
     //Calculate the number of interrupt misses if there were any
     if (_hf_irq_count < expected) _hf_irq_miss = expected - _hf_irq_count;
 }
