@@ -122,7 +122,8 @@ static void hf_irq_stress_run(void) {
     add_repeating_timer_us(delay_us, PICO_REPEATING_Callback, NULL, &timer);
     vTaskDelay(pdMS_TO_TICKS(HF_IRQ_DURATION_MS));
     cancel_repeating_timer(&timer);
-    
+    //Set the interrupt miss counter to 0
+    _hf_irq_miss = 0;
     if (_hf_irq_count < expected)
         _hf_irq_miss = expected - _hf_irq_count;
 }
@@ -276,7 +277,7 @@ static void hf_irq_stress_run(void) {
     //Stop hardware timer 2 after the test
     timer_stop(TIMER_DEV(2));
     //Set the interrupt miss counter to 0
-    _hf_irq_miss = 0
+    _hf_irq_miss = 0;
     //Calculate the number of interrupt misses if there were any
     if (_hf_irq_count < expected) _hf_irq_miss = expected - _hf_irq_count;
 }
@@ -441,6 +442,8 @@ static void hf_irq_stress_run(void) {
     //Stop the timer after sleeping and calculate the number of misses if there
     // were any
     counter_stop(_hf_ctr);
+    //Set the interrupt miss counter to 0
+    _hf_irq_miss = 0;
     if (_hf_irq_count < expected) _hf_irq_miss = expected - _hf_irq_count;
 }
 
