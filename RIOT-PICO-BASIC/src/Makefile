@@ -25,6 +25,8 @@ USEMODULE += fatfs_vfs
 
 #Networking
 USEMODULE += gnrc_sock_udp
+#No Ipv4 implementation that'll even let the code compile, eventhough the IPv6 version
+# is still incapable of using the Infineon CYW 43439 wireless chip
 USEMODULE += gnrc_ipv6
 USEMODULE += auto_init_gnrc_netif
 
