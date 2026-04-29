@@ -226,6 +226,10 @@ static void *sensor_thread(void *arg) {
 }
 
 //Thread to execute network task
+//Uses IPv6 since no IPv4 implementation exists for the RP2040 that
+// will allow the code to compile, note that the IPv6 implementation
+// still cannot communicate with the Infineon CYW 43439 wireless chip
+// to allow messages to actually be sent over UDP
 static void *net_thread(void *arg) {
     (void)arg;
     //Initialize message with NET_MSG_SIZE bytes
@@ -255,6 +259,38 @@ static void *net_thread(void *arg) {
     //Kill thread after execution
     return NULL;
 }
+
+/*Original IPv4 version of the code
+static void *net_thread(void *arg) {
+    (void)arg;
+    //Initialize message with NET_MSG_SIZE bytes
+    uint8_t msg[NET_MSG_SIZE];
+    //Fill the msg array with numbers
+    for (uint32_t i = 0; i < NET_MSG_SIZE; i++) msg[i] = (uint8_t)i;
+
+    //Send UDP packets to an IPv4 Address, port 8080
+    sock_udp_ep_t remote = { .family = AF_INET, .port = 8080 };
+    //Translate the human readable private IPv4 address 192.168.1.100 to machine
+    // readable 32-bit binary format and store the converted data to
+    //the memory address of remote.addr.ipv4
+    ipv4_addr_from_str((ipv4_addr_t *)&remote.addr.ipv4, "192.168.1.100");
+
+    //Attempt to send message NET_MSG_COUNT times 
+    for (uint32_t i = 0; i < NET_MSG_COUNT; i++) {
+        //Send the message over any socket available to the destination address
+        // defined by remote then close the socket
+        ssize_t res = sock_udp_send(NULL, msg, NET_MSG_SIZE, &remote);
+        //If the packet was send successfully over UDP iterate _net_sent, otherwise
+        // iterate _net_lost
+        if (res >= 0) _net_sent++;
+        else _net_lost++;
+        //Sleep for 5 milliseconds
+        ztimer_sleep(ZTIMER_MSEC, 5U);
+    }
+    //Kill thread after execution
+    return NULL;
+}
+*/
 
 //Every time the hardware timer hits 0 this function is ran to increment the
 // sucessful interrupt counter
