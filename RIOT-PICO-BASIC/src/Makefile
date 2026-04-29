@@ -27,12 +27,12 @@ USEMODULE += fatfs_vfs
 USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6
 USEMODULE += auto_init_gnrc_netif
+
 #As per the RIOT documentation (https://api.riot-os.org/group__boards__rpi__pico__w.html)
-# this line of code or something like it has not actually been implmented for the RP 2040,
+# gnrc_netdev_default or something like it has not actually been implmented for the RP 2040,
 # due to the fact there there is no support for the Infineon CYW 43439 wireless chip, as such
 # the data can be processed but there is no way for it to be sent out to the wireless chip
 #USEMODULE += gnrc_netdev_default
-
 
 #Sensors
 USEMODULE += dht
@@ -41,6 +41,13 @@ USEMODULE += dht
 USEMODULE += periph_uart
 USEMODULE += periph_timer
 USEMODULE += periph_gpio_irq
+
+#As per the RIOT documentation (https://api.riot-os.org/group__boards__rpi__pico__w.html)
+# periph_wdt or something like it has not actually been implmented for the RP 2040, due to the
+# fact there there is no support for the Hardware Watchdog, as such boot_recovery.c's
+# _trigger_watchdog_reset function simulates a hardware reboot with a timer and then a software
+# reboot 
+#USEMODULE += periph_wdt
 
 #SD Card Block Device Driver
 USEMODULE += sdcard_spi
