@@ -319,6 +319,15 @@ static void hf_irq_stress_run(void) {
     if (_hf_irq_count < expected) _hf_irq_miss = expected - _hf_irq_count;
 }
 
+//Dummy thread for concurrent threads
+static void *dummy_thread(void *arg) {
+    (void)arg;
+    for (uint32_t i = 0; i < SENSOR_TOTAL_SAMPLES; i++) {
+        ztimer_sleep(ZTIMER_MSEC, SENSOR_PERIOD_MS);
+    }
+    return NULL;
+}
+
 workload_results_t workload_run(void) {
     //Initialize various metrics to 0
     _sensor_samples = _sensor_missed = _net_sent = _net_lost = 0;
@@ -332,7 +341,7 @@ workload_results_t workload_run(void) {
     for (uint32_t i = 0; i < CONCURRENT_TASKS; i++) {
         int pri = THREAD_PRIORITY_MAIN - 1 - (int)(i % 4);
         thread_create(_ct_stacks[i], THREAD_STACKSIZE_MINIMUM,
-                      pri, 0, sensor_thread, NULL, "ct");
+                      pri, 0, dummy_thread, NULL, "ct");
     }
 
     //Sleep for the duration of the sensor task with 500ms of extra time
@@ -484,6 +493,14 @@ static void hf_irq_stress_run(void) {
     if (_hf_irq_count < expected) _hf_irq_miss = expected - _hf_irq_count;
 }
 
+//Dummy thread for concurrent tasks
+static void dummy_entry(void *a, void *b, void *c) {
+    (void)a; (void)b; (void)c;
+    for (uint32_t i = 0; i < SENSOR_TOTAL_SAMPLES; i++) {
+        k_msleep(SENSOR_PERIOD_MS);
+    }
+}
+
 workload_results_t workload_run(void) {
     //Initialize metrics variables
     _sensor_samples = _sensor_missed = _net_sent = _net_lost = 0;
@@ -500,7 +517,7 @@ workload_results_t workload_run(void) {
         int pri = 5 + (int)(i % 4);
         k_thread_create(&_ct_td[i], _ct_stacks_z[i],
                         K_THREAD_STACK_SIZEOF(_ct_stacks_z[i]),
-                        sensor_entry, NULL, NULL, NULL, pri, 0, K_NO_WAIT);
+                        dummy_entry, NULL, NULL, NULL, pri, 0, K_NO_WAIT);
     }
 
     //Sleep until the sensor task is finished
