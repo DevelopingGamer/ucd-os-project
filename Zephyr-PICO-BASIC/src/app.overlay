@@ -1,0 +1,90 @@
+/ {
+    /* DHT22 Sensor Mapping (For workload_sim.c) */
+    dht22 {
+        compatible = "aosong,dht";
+        status = "okay";
+        /* Ensure this pin matches your physical wiring (GP20) */
+        dio-gpios = <&gpio0 20 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+    };
+
+    /* Latency Test Pin Mappings (For latency_meas.c) */
+    buttons {
+        compatible = "gpio-keys";
+        
+        bench_trig: bench_trig {
+            gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
+            status = "okay";
+        };
+
+        bench_capt: bench_capt {
+            gpios = <&gpio0 15 GPIO_ACTIVE_HIGH>;
+            status = "okay";
+        };
+    };
+
+    aliases {
+        bench-trigger = &bench_trig;
+        bench-capture = &bench_capt;
+    };
+
+    /* Retained Memory Block (For boot_recovery.c) */
+    sram0_retained: memory@2003F000 {
+        compatible = "zephyr,memory-region", "mmio-sram";
+        reg = <0x2003F000 0x1000>;
+        zephyr,memory-region = "RetainedMem";
+        status = "okay";
+
+        /* The retained-ram node must live INSIDE the memory region */
+        retram: retained_mem {
+            compatible = "zephyr,retained-ram";
+            status = "okay";
+        };
+    };
+};
+
+/* Enable Hardware Timer for workload_sim.c interrupt stress test */
+&timer0 {
+    status = "okay";
+};
+
+/* Enable the physical watchdog hardware for boot_recovery.c recovery test*/
+&wdt0 {
+    status = "okay";
+};
+
+/* Map PICO Pins to SD Card Module pins */
+&pinctrl {
+    spi0_default: spi0_default {
+        group1 {
+            pinmux = <SPI0_RX_P4>,  /* MISO / RX */
+                     <SPI0_SCK_P2>, /* SCK / Clock */
+                     <SPI0_TX_P3>;  /* MOSI / TX */
+        };
+    };
+};
+
+/* SPI Bus Configuration */
+&spi0 {
+    status = "okay";
+    pinctrl-0 = <&spi0_default>;
+    pinctrl-names = "default";
+    
+    /* Map Chip Select to GP5 */
+    cs-gpios = <&gpio0 5 GPIO_ACTIVE_LOW>;
+
+    /* SD Card Device Definition */
+    sdhc0: sdhc@0 {
+        compatible = "zephyr,sdhc-spi-slot";
+        reg = <0>;
+        spi-max-frequency = <24000000>; 
+        status = "okay";
+
+        /* Disk Subsystem Link */
+        mmc {
+            compatible = "zephyr,sdmmc-disk";
+            /* disk-name maps to disk_access_init("SD") in fs_bench.c */
+            disk-name = "SD"; 
+            status = "okay";
+        };
+    };
+};
