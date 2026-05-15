@@ -99,6 +99,8 @@
  /mnt/data/Git/RIOT/sys/include/div.h \
  /mnt/data/Git/RIOT/sys/include/xtimer/implementation.h \
  /mnt/data/Git/RIOT/drivers/include/periph/timer.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_hw_support/include/esp_sleep.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/include/hal/touch_sensor_types.h \
  /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_system/include/esp_system.h \
  /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_idf_version.h \
  /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/heap/include/esp_heap_caps.h \
@@ -203,6 +205,8 @@
 /mnt/data/Git/RIOT/sys/include/div.h:
 /mnt/data/Git/RIOT/sys/include/xtimer/implementation.h:
 /mnt/data/Git/RIOT/drivers/include/periph/timer.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_hw_support/include/esp_sleep.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/include/hal/touch_sensor_types.h:
 /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_system/include/esp_system.h:
 /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_idf_version.h:
 /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/heap/include/esp_heap_caps.h:

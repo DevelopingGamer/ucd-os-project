@@ -8,6 +8,7 @@
 #include "xtimer.h"
 
 //Include Espressif system API for rebooting and RTC attributes
+#include "esp_sleep.h"
 #include "esp_system.h"
 #include "esp_attr.h"
 #include "esp_heap_caps.h"
@@ -20,18 +21,16 @@ extern char _eheap;
 #include "schedstatistics.h"
 #endif
 
-#define MAX_TEST_RUNS 5
-
 // Variables assigned to RTC fast memory do not reset during a software reboot
 RTC_NOINIT_ATTR static uint32_t run_counter;
 RTC_NOINIT_ATTR static uint32_t accumulated_us;
 
-int64_t boot_times(void) {
+int boot_times(uint32_t runs) {
     int64_t boot_time_us = esp_timer_get_time();
     // uint32_t boot_time_ms = (uint32_t)(boot_time_us / 1000);
 
     // Determine if this is a fresh manual power-on or an automated cycle
-    if (run_counter > MAX_TEST_RUNS || run_counter == 0) {
+    if (run_counter > runs || run_counter == 0) {
         run_counter = 1;
         accumulated_us = 0;
         printf("\n--- Starting New Boot Test Series ---\n");
@@ -39,10 +38,10 @@ int64_t boot_times(void) {
 
     // Accumulate current run metrics
     accumulated_us += boot_time_us;
-    printf("Run [%lu/%d]: Booted in %lu us\n", (unsigned long)run_counter, MAX_TEST_RUNS, (unsigned long)boot_time_us);
+    printf("Run [%lu/%lu]: Booted in %lu us\n", (unsigned long)run_counter, (unsigned long)runs, (unsigned long)boot_time_us);
 
-    if (run_counter >= MAX_TEST_RUNS) {
-        int64_t average_us = accumulated_us / MAX_TEST_RUNS;
+    if (run_counter >= runs) {
+        int64_t average_us = accumulated_us / runs;
 
         printf("\n====================================\n");
         printf("  TEST COMPLETE: Average Boot Time = %lu us\n", (unsigned long)average_us);
@@ -59,7 +58,46 @@ int64_t boot_times(void) {
     }
 }
 
-void cpu_load(void)
+uint32_t sleep_recovery(void)
+{
+    int64_t recovery_time_us = esp_timer_get_time();
+
+    // Determine what triggered the current system startup sequence
+    esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+
+    printf("\n=============================================\n");
+    printf("         SYSTEM RECOVERY BENCHMARK           \n");
+    printf("=============================================\n");
+
+    if (wakeup_reason == ESP_SLEEP_WAKEUP_TIMER) {
+        // The device was in deep sleep and woke up via the RTC timer
+        printf(" Wakeup Status: DEEP SLEEP RECOVERY SUCCESSFUL\n");
+        printf(" Recovery Time: %lu us (~%lu ms)\n", (unsigned long)recovery_time_us, (unsigned long)(recovery_time_us / 1000));
+        printf(" (Time taken from hardware wake to RIOT main execution context)\n");
+        printf("=============================================\n\n");
+    } else {
+        // The device experienced a fresh power-on or standard hard reset
+        printf(" Wakeup Status: COLD START / POWER-ON RESET\n");
+        printf(" Preparing recovery testing profile...\n");
+        printf(" Setting RTC wakeup timer for 4 seconds...\n");
+        
+        // Configure the ESP32 RTC controller to wake up in 4,000,000 microseconds
+        esp_sleep_enable_timer_wakeup(4000000);
+
+        printf(" Entering deep sleep state now. Serial terminal will disconnect...\n");
+        printf("=============================================\n\n");
+        
+        // Flush remaining characters out of the physical UART buffer
+        fflush(stdout);
+        ztimer_sleep(ZTIMER_MSEC, 500);
+
+        esp_deep_sleep_start();
+    }
+
+    return recovery_time_us;
+}
+
+int* cpu_load(void)
 {
 #ifndef MODULE_SCHEDSTATISTICS
     printf("Error: 'schedstatistics' module is missing from the Makefile.\n");
@@ -68,6 +106,7 @@ void cpu_load(void)
     uint32_t total_runtime = 0;
     uint32_t idle_runtime = 0;
     int16_t idle_pid = KERNEL_PID_UNDEF;
+    static int percent_arr[2];
 
     // 1. Identify the Process ID (PID) of the system idle thread
     for (int i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
@@ -99,20 +138,26 @@ void cpu_load(void)
         uint32_t cpu_load_percent = (active_runtime * 100) / total_runtime;
         uint32_t cpu_load_fraction = ((active_runtime * 10000) / total_runtime) % 100;
 
-        printf("\n--- CPU Load Analysis ---\n");
+        percent_arr[0] = cpu_load_percent;
+        percent_arr[1] = cpu_load_fraction;
+
+        printf("\n\n--- CPU Load Analysis ---\n");
         printf("Total Runtime Units : %lu\n", (unsigned long)total_runtime);
         printf("Idle Thread Units  : %lu\n", (unsigned long)idle_runtime);
         printf("Active Thread Units: %lu\n", (unsigned long)active_runtime);
         printf("Current CPU Load   : %lu.%02lu %%\n", (unsigned long)cpu_load_percent, 
                                                        (unsigned long)cpu_load_fraction);
         printf("-------------------------\n");
+
+        return percent_arr;
     } else {
         printf("CPU Load tracking warming up... Try again on next interval.\n");
+        return percent_arr;
     }
 #endif
 }
 
-void memory_footprint(void)
+int memory_footprint(void)
 {
     printf("\n=============================================\n");
     printf("         SYSTEM MEMORY FOOTPRINT             \n");
@@ -153,10 +198,14 @@ void memory_footprint(void)
         }
     }
     printf("=============================================\n\n");
+
+    return used_heap;
 }
 
 int main(void) {
-    uint32_t average_boot_times = boot_times();
+    uint32_t test_runs = 5;
+
+    uint32_t average_boot_times = boot_times(test_runs);
 
     thread_yield();
     
@@ -173,11 +222,34 @@ int main(void) {
     memory_footprint();
 
     free(test_buffer);
+
+    int cumulative_recovery = 0;
+    int cumulative_memory = 0;
+    uint32_t cumulative_cpu_percent = 0;
+    uint32_t cumulative_cpu_fraction = 0;
+    
+    for (uint32_t i=0; i<test_runs; i++) {
+        cumulative_recovery += sleep_recovery();
+        cumulative_memory = memory_footprint();
+        int* ptr = cpu_load();
+        cumulative_cpu_percent += ptr[0];
+        cumulative_cpu_fraction += ptr[1];
+    }
+
+    int average_recovery_times_us = cumulative_recovery / test_runs;
+    int average_memory_footprint = cumulative_memory / test_runs;
+    uint32_t average_recovery_times_ms = average_recovery_times_us / 1000;
+
+    uint32_t average_cpu_percent = cumulative_cpu_percent / test_runs;
+    uint32_t average_cpu_fraction = cumulative_cpu_fraction / test_runs;
     
     while(1) {
-        cpu_load();
-        printf("\nAverage Boot times (us): %lu", (unsigned long)average_boot_times);
-        ztimer_sleep(ZTIMER_MSEC, 10000);
+        printf("\n\nAverage Boot Times (us): %lu", (unsigned long)average_boot_times);
+        printf("\nAverage Recovery Times (us): %lu", (unsigned long)average_recovery_times_us);
+        printf("\nAverage Recovery Times (Approximate) (ms): %lu", (unsigned long)average_recovery_times_ms);
+        printf("\nAverage CPU Load (%%): %lu.%lu", (unsigned long)average_cpu_percent, (unsigned long)average_cpu_fraction);
+        printf("\nAverage Memory Footprint (bytes): %lu", (unsigned long)average_memory_footprint);
+        ztimer_sleep(ZTIMER_MSEC, 5000);
     }
 
     return 0;
