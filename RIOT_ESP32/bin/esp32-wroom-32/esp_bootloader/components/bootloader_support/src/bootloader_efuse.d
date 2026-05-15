@@ -1,0 +1,58 @@
+-I/mnt/data/Git/ucd-os-project/RIOT_ESP32/bin/esp32-wroom-32/riotbuild/: \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/src/bootloader_efuse.c \
+ /mnt/data/Git/ucd-os-project/RIOT_ESP32/bin/esp32-wroom-32/riotbuild/riotbuild.h \
+ /mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_idf_ver.h \
+ /mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig_default_esp32.h \
+ /mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig_default_common.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/include/bootloader_common.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/include/esp_flash_partitions.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_err.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_compiler.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_types.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/include/esp_image_format.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/include/esp_app_format.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_assert.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/esp32/include/hal/efuse_ll.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/include/soc/efuse_periph.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/efuse_reg.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/soc.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/soc_caps.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/interrupts.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_bit_defs.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/reg_base.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/efuse_defs.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/efuse_struct.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/platform_port/include/hal/misc.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/platform_port/include/hal/assert.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/esp32/include/hal/efuse_hal.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/include/hal/efuse_hal.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_attr.h
+/mnt/data/Git/ucd-os-project/RIOT_ESP32/bin/esp32-wroom-32/riotbuild/riotbuild.h:
+/mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_idf_ver.h:
+/mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig_default_esp32.h:
+/mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig_default_common.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/include/bootloader_common.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/include/esp_flash_partitions.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_err.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_compiler.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_types.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/include/esp_image_format.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/include/esp_app_format.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_assert.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/esp32/include/hal/efuse_ll.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/include/soc/efuse_periph.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/efuse_reg.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/soc.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/soc_caps.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/interrupts.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_bit_defs.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/reg_base.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/efuse_defs.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/efuse_struct.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/platform_port/include/hal/misc.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/platform_port/include/hal/assert.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/esp32/include/hal/efuse_hal.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/include/hal/efuse_hal.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_attr.h:

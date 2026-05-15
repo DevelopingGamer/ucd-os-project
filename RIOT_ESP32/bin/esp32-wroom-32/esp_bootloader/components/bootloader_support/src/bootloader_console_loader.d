@@ -1,0 +1,50 @@
+-I/mnt/data/Git/ucd-os-project/RIOT_ESP32/bin/esp32-wroom-32/riotbuild/: \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/src/bootloader_console_loader.c \
+ /mnt/data/Git/ucd-os-project/RIOT_ESP32/bin/esp32-wroom-32/riotbuild/riotbuild.h \
+ /mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_idf_ver.h \
+ /mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig_default_esp32.h \
+ /mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig_default_common.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/private_include/bootloader_console.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_rom/include/esp_rom_uart.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/esp32/include/hal/uart_ll.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/platform_port/include/hal/misc.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_attr.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/uart_reg.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/soc.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_assert.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/soc_caps.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/interrupts.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_bit_defs.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/reg_base.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/uart_struct.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/dport_reg.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/dport_access.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/include/hal/uart_types.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/clk_tree_defs.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_rom/include/esp_rom_sys.h \
+ /mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/reset_reasons.h
+/mnt/data/Git/ucd-os-project/RIOT_ESP32/bin/esp32-wroom-32/riotbuild/riotbuild.h:
+/mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_idf_ver.h:
+/mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig_default_esp32.h:
+/mnt/data/Git/RIOT/cpu/esp32/bootloader/sdkconfig_default_common.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/bootloader_support/private_include/bootloader_console.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_rom/include/esp_rom_uart.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/esp32/include/hal/uart_ll.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/platform_port/include/hal/misc.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_attr.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/uart_reg.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/soc.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_assert.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/soc_caps.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/interrupts.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_common/include/esp_bit_defs.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/reg_base.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/uart_struct.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/register/soc/dport_reg.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/dport_access.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/hal/include/hal/uart_types.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/clk_tree_defs.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/esp_rom/include/esp_rom_sys.h:
+/mnt/data/Git/RIOT/build/pkg/esp32_sdk/components/soc/esp32/include/soc/reset_reasons.h:
