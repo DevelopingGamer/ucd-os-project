@@ -1,3 +1,4 @@
+//west build -p always -b rpi_pico2/rp2350a/m33/w
 #include "benchmark_common.h"
 #include "bench_log.h"
 #include "boot_recovery.h"
@@ -22,8 +23,11 @@
 #elif defined(RIOT_OS)
 #include "ztimer.h"
 
+#elif defined(ZEPHYR)
+#include <zephyr/kernel.h>
+#include <zephyr/timing/timing.h>
+#include <zephyr/drivers/uart.h>
 #endif
-
 
 void bench_init(void) {
 #if defined(FREERTOS_PICO)
@@ -33,6 +37,11 @@ void bench_init(void) {
     //Set the physical pins for UART
     gpio_set_function(0, GPIO_FUNC_UART);
     gpio_set_function(1, GPIO_FUNC_UART);
+
+#elif defined(ZEPHYR)
+    timing_init();
+    timing_start();
+
 #endif
 }
 
@@ -50,8 +59,8 @@ void bench_run_all(bench_results_t *out, uint32_t run_idx) {
     out->stability.recovery_ms = boot_measure_recovery_ms(false);
 
     //Run latency_meas.c
-    //Does not work alongside fs_bench.c
-    //out->latency = latency_measure_all();
+    //Does not work alongside fs_bench.c in FreeRTOS
+    out->latency = latency_measure_all();
 
     //Run io_bench.c
     io_stats_t io_res = io_bench_run();
@@ -59,7 +68,7 @@ void bench_run_all(bench_results_t *out, uint32_t run_idx) {
     out->io.uart_packet_loss_pct = io_res.packet_loss_pct;
 
     //Run fs_bench.c
-    //Does not work alongside latency_meas.c
+    //Does not work alongside latency_meas.c in FreeRTOS
     fs_stats_t fs_res = fs_bench_run();
     out->io.fs_write_kbps = fs_res.fs_write_kbps;
     out->io.fs_read_kbps  = fs_res.fs_read_kbps;
@@ -71,6 +80,11 @@ void bench_run_all(bench_results_t *out, uint32_t run_idx) {
     //Run cpu_monitor.c
     out->cpu = cpu_monitor_sample();
     out->mem = mem_profile_collect();
+
+    #if defined(ZEPHYR)
+        //print to get log output
+        printk("");
+    #endif
 }
 
 static void execute_benchmark_suite(void) {
@@ -132,7 +146,7 @@ static void main_task(void *arg) {
                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
             
         printf("Attempting to connect to Wi-Fi\n");
-        cyw43_arch_wifi_connect_async("PicoTest", "7i59e9j6gusk825", CYW43_AUTH_WPA2_AES_PSK);
+        cyw43_arch_wifi_connect_async("PicoTest", "8wQ9h0T63fhet910", CYW43_AUTH_WPA2_AES_PSK);
         
         int retry_limit = 2000; 
         while(retry_limit > 0) {
@@ -203,8 +217,23 @@ void vApplicationMallocFailedHook(void) {
 #elif defined(RIOT_OS) || defined(ZEPHYR)
 
 int main(void) {
+#if defined(ZEPHYR)
+    //Get the console device from the Device Tree
+    const struct device *console_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+    uint32_t dtr = 0;
+    
+    if (device_is_ready(console_dev)) {
+        //Pause the microcontroller until the Serial Monitor is opened
+        while (!dtr) {
+            uart_line_ctrl_get(console_dev, UART_LINE_CTRL_DTR, &dtr);
+            k_msleep(100);
+        }
+        //Give a 500ms buffer after connection before sending data
+        k_msleep(500);
+    }
+#endif
+
     execute_benchmark_suite();
     return 0;
 }
-
 #endif

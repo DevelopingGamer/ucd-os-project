@@ -199,6 +199,7 @@ fs_stats_t fs_bench_run(void) {
 #elif defined(ZEPHYR)
 #include <zephyr/fs/fs.h>
 #include <zephyr/storage/disk_access.h>
+#include <ff.h>
 
 //Initialize the Zephyr mount struct,
 // set the driver to the FS_FATFS driver,
@@ -208,29 +209,46 @@ fs_stats_t fs_bench_run(void) {
 // the boot sector of the SD card, and
 //have the VFS find the physical device
 // registered with the name "SD"
+static FATFS _fat_fs;
 static struct fs_mount_t _mnt = {
     .type        = FS_FATFS,
     .mnt_point   = "/SD:",
-    .fs_data     = NULL,
+    .fs_data     = &_fat_fs,
     .storage_dev = (void *)"SD",
 };
 
+//Initialization guard for file system mount
+static bool _zephyr_fs_ready = false;
+
 fs_stats_t fs_bench_run(void) {
-    //Initialize struct values to 0
-    fs_stats_t     s = {0};
-    //Initialize the file object
+    fs_stats_t s = {0};
     struct fs_file_t f;
-    //Populate the buffer
-    for (uint32_t i = 0; i < FS_BLOCK_SIZE; i++) _fs_buf[i] = (uint8_t)i;
-    //Initialize SD Card, if it fails return the struct
-    if (disk_access_init("SD") != 0) {
-        return s; 
+    int ret;
+
+    //Check Initialization
+    if (!_zephyr_fs_ready) {
+        ret = disk_access_init("SD");
+        if (ret != 0) {
+            printk("FS ERROR: disk_access_init failed with code %d\n", ret);
+            return s;
+        }
+        
+        ret = fs_mount(&_mnt);
+        if (ret != 0) {
+            printk("FS ERROR: fs_mount failed with code %d\n", ret);
+            return s;
+        }
+        _zephyr_fs_ready = true;
     }
-    //Set the mount structure to active
-    fs_mount(&_mnt);
-    //Set the variable f so Zephyr can use it as a file object that can
-    //be used in fs_open
+
     fs_file_t_init(&f);
+
+    //Check File Open
+    ret = fs_open(&f, "/SD:/bench.bin", FS_O_CREATE | FS_O_WRITE);
+    if (ret != 0) {
+        printk("FS ERROR: fs_open failed with code %d\n", ret);
+        return s;
+    }
     //Open the file in the SD card, create it if it doesn't exist yet,
     // and open it in write mode
     fs_open(&f, "/SD:/bench.bin", FS_O_CREATE | FS_O_WRITE);

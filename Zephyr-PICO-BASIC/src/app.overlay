@@ -1,9 +1,14 @@
 / {
+    /* USB Console Routing */
+    chosen {
+        zephyr,console = &cdc_acm_uart0;
+    };
+
     /* DHT22 Sensor Mapping (For workload_sim.c) */
     dht22 {
         compatible = "aosong,dht";
         status = "okay";
-        /* Ensure this pin matches your physical wiring (GP20) */
+        /* Ensure this pin matches physical wiring (GP20) */
         dio-gpios = <&gpio0 20 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
     };
 
@@ -56,35 +61,44 @@
 &pinctrl {
     spi0_default: spi0_default {
         group1 {
-            pinmux = <SPI0_RX_P4>,  /* MISO / RX */
-                     <SPI0_SCK_P2>, /* SCK / Clock */
-                     <SPI0_TX_P3>;  /* MOSI / TX */
+            /* TX and SCK do not need pull-ups */
+            pinmux = <SPI0_TX_P3>, <SPI0_SCK_P2>;
+        };
+        group2 {
+            /* RX pull-up to prevent -134 ENOTSUP errors */
+            pinmux = <SPI0_RX_P4>;
+            bias-pull-up; 
         };
     };
 };
 
-/* SPI Bus Configuration */
+/* Apply the pins to the SPI bus and define the SDHC node */
 &spi0 {
     status = "okay";
     pinctrl-0 = <&spi0_default>;
     pinctrl-names = "default";
     
-    /* Map Chip Select to GP5 */
+    /* Software Chip Select */
     cs-gpios = <&gpio0 5 GPIO_ACTIVE_LOW>;
 
-    /* SD Card Device Definition */
     sdhc0: sdhc@0 {
         compatible = "zephyr,sdhc-spi-slot";
         reg = <0>;
-        spi-max-frequency = <24000000>; 
+        spi-max-frequency = <4000000>; 
         status = "okay";
 
         /* Disk Subsystem Link */
-        mmc {
+        sdmmc_disk: mmc {
             compatible = "zephyr,sdmmc-disk";
-            /* disk-name maps to disk_access_init("SD") in fs_bench.c */
-            disk-name = "SD"; 
             status = "okay";
+            disk-name = "SD"; 
         };
+    };
+};
+/* USB Device stack for Serial Console */
+&zephyr_udc0 {
+    status = "okay";
+    cdc_acm_uart0: cdc_acm_uart0 {
+        compatible = "zephyr,cdc-acm-uart";
     };
 };

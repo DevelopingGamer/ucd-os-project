@@ -374,14 +374,13 @@ workload_results_t workload_run(void) {
 #include <zephyr/drivers/counter.h>
 
 //Allocate memory for sensor, network, and background threads
-K_THREAD_STACK_DEFINE(_sens_stack_z, 1024);
+K_THREAD_STACK_DEFINE(_sens_stack_z, 2048);
 K_THREAD_STACK_DEFINE(_net_stack_z,  1024);
 K_THREAD_STACK_ARRAY_DEFINE(_ct_stacks_z, CONCURRENT_TASKS, 512);
 //Create thread control blocks (one for the sensor and network task and
 // CONCURRENT_TASKS for the background tasks)
 static struct k_thread _sens_td, _net_td, _ct_td[CONCURRENT_TASKS];
 
-//Sensor thread
 //Sensor thread
 static void sensor_entry(void *a, void *b, void *c) {
     //Have 3 void pointers as function parameters due to Zephyr requirements
@@ -415,8 +414,8 @@ static void sensor_entry(void *a, void *b, void *c) {
     }
 }
 
-//Network thread
-static void net_entry(void *a, void *b, void *c) {
+//Orignal Network Thread assuming we could get WiFi to not crash the Pico2W instantly
+/*static void net_entry(void *a, void *b, void *c) {
     (void)a; (void)b; (void)c;
     //Initialize message and fill message with numbers
     uint8_t msg[NET_MSG_SIZE];
@@ -449,7 +448,15 @@ static void net_entry(void *a, void *b, void *c) {
     }
     //Close the socket once execution finishes
     zsock_close(sock);
+}*/
+
+
+static void net_entry(void *a, void *b, void *c) {
+    (void)a; (void)b; (void)c;
+    _net_sent = 0;
+    _net_lost = NET_MSG_COUNT;
 }
+
 
 //Configuration file for interrupt
 static struct counter_alarm_cfg _hf_alarm;
@@ -489,6 +496,8 @@ static void hf_irq_stress_run(void) {
     //Stop the timer after sleeping and calculate the number of misses if there
     // were any
     counter_stop(_hf_ctr);
+    //Cancel the alarn set by the final callback
+    counter_cancel_channel_alarm(_hf_ctr, 0);
     //Set the interrupt miss counter to 0
     _hf_irq_miss = 0;
     if (_hf_irq_count < expected) _hf_irq_miss = expected - _hf_irq_count;
@@ -521,21 +530,28 @@ workload_results_t workload_run(void) {
                         dummy_entry, NULL, NULL, NULL, pri, 0, K_NO_WAIT);
     }
 
-    //Sleep until the sensor task is finished
-    k_thread_join(&_sens_td, K_FOREVER);
+    //Sleep for the duration of the sensor task with a 500ms buffer
+    k_msleep(SENSOR_TOTAL_SAMPLES * SENSOR_PERIOD_MS + 500U);
     //Run the interrupt stress test
     hf_irq_stress_run();
 
-    //Set struct varaibles to global varaibles and return the struct
+    //Abort all threads before calculating values
+    k_thread_abort(&_sens_td);
+    k_thread_abort(&_net_td);
+    for (uint32_t i = 0; i < CONCURRENT_TASKS; i++) {
+        k_thread_abort(&_ct_td[i]);
+    }
+    //Set struct variables to global varaibles and return the struct
     workload_results_t r;
     r.sensor_samples_total  = _sensor_samples;
     r.sensor_missed_samples = _sensor_missed;
-    r.sensor_miss_rate_pct  = (_sensor_samples > 0)
-        ? (float)_sensor_missed * 100.0f / (float)_sensor_samples : 0.0f;
-    r.net_msgs_sent          = _net_sent;
-    r.net_msgs_lost          = _net_lost;
-    r.net_loss_pct           = ((_net_sent + _net_lost) > 0)
-        ? (float)_net_lost * 100.0f / (float)(_net_sent + _net_lost) : 0.0f;
+    r.sensor_miss_rate_pct = (_deadline_total > 0)
+        ? (float)_sensor_missed * 100.0f / (float)_deadline_total : 0.0f;
+    //Calculations disabled and replaced with 0 or -1 due to no WiFi
+    r.net_msgs_sent          = 0;//_net_sent
+    r.net_msgs_lost          = 0;//_net_lost
+    r.net_loss_pct           = -1;//((_net_sent + _net_lost) > 0)
+        //? (float)_net_lost * 100.0f / (float)(_net_sent + _net_lost) : 0.0f;
     r.concurrent_tasks_run   = CONCURRENT_TASKS;
     r.hf_irq_count           = _hf_irq_count;
     r.hf_irq_miss_count      = _hf_irq_miss;

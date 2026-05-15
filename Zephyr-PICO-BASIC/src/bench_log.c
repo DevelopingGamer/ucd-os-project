@@ -57,106 +57,106 @@
 void bench_log_results(const bench_results_t *r) {
     LOG_PRINT("\r\n");
     LOG_PRINT("====================================================\r\n");
-    LOG_PRINT("  RTOS Benchmark: %-16s  Run %lu\r\n",
+    LOG_PRINT("  RTOS Benchmark: %-16s  Run %u\r\n",
               r->platform, r->run_index);
     LOG_PRINT("====================================================\r\n");
 
     /* Boot & recovery */
     LOG_PRINT("\r\n[BOOT & RECOVERY]\r\n");
-    LOG_PRINT("  Boot time               : %lu ms\r\n",  r->boot_time_ms);
-    LOG_PRINT("  System recovery time    : %lu ms\r\n",  r->stability.recovery_ms);
+    LOG_PRINT("  Boot time               : %u ms\r\n",  r->boot_time_ms);
+    LOG_PRINT("  System recovery time    : %u ms\r\n",  r->stability.recovery_ms);
 
     /* CPU utilisation */
     LOG_PRINT("\r\n[CPU UTILISATION]\r\n");
-    LOG_PRINT("  Idle                    : %.2f %%\r\n", r->cpu.idle_pct);
-    LOG_PRINT("  Under load              : %.2f %%\r\n", r->cpu.load_pct);
-    LOG_PRINT("  Idle ticks              : %lu\r\n",     r->cpu.idle_ticks);
-    LOG_PRINT("  Total ticks             : %lu\r\n",     r->cpu.total_ticks);
+    LOG_PRINT("  Idle                    : %.2f %%\r\n", (double)r->cpu.idle_pct);
+    LOG_PRINT("  Under load              : %.2f %%\r\n", (double)r->cpu.load_pct);
+    LOG_PRINT("  Idle ticks              : %u\r\n",     r->cpu.idle_ticks);
+    LOG_PRINT("  Total ticks             : %u\r\n",     r->cpu.total_ticks);
 
     /* Memory - compile-time */
     LOG_PRINT("\r\n[MEMORY FOOTPRINT - COMPILE TIME]\r\n");
-    LOG_PRINT("  .text + .rodata         : %lu bytes\r\n", STATIC_TEXT_BYTES);
-    LOG_PRINT("  .data + .bss            : %lu bytes\r\n", STATIC_DATA_BYTES);
+    LOG_PRINT("  .text + .rodata         : %u bytes\r\n", STATIC_TEXT_BYTES);
+    LOG_PRINT("  .data + .bss            : %u bytes\r\n", STATIC_DATA_BYTES);
 
     /* Memory - runtime */
     LOG_PRINT("\r\n[MEMORY FOOTPRINT - RUNTIME]\r\n");
-    LOG_PRINT("  Heap used               : %lu bytes\r\n", r->mem.heap_used_bytes);
-    LOG_PRINT("  Heap free               : %lu bytes\r\n", r->mem.heap_free_bytes);
-    LOG_PRINT("  Heap low-water mark     : %lu bytes\r\n", r->mem.heap_min_ever_free);
-    LOG_PRINT("  Task stack HWM          : %lu bytes\r\n", r->mem.task_stack_hwm_bytes);
-    LOG_PRINT("  Total footprint         : %lu KB\r\n",    r->mem.footprint_kb);
+    LOG_PRINT("  Heap used               : %u bytes\r\n", r->mem.heap_used_bytes);
+    LOG_PRINT("  Heap free               : %u bytes\r\n", r->mem.heap_free_bytes);
+    LOG_PRINT("  Heap low-water mark     : %u bytes\r\n", r->mem.heap_min_ever_free);
+    LOG_PRINT("  Task stack HWM          : %u bytes\r\n", r->mem.task_stack_hwm_bytes);
+    LOG_PRINT("  Total footprint         : %u KB\r\n",    r->mem.footprint_kb);
 
     /* Interrupt latency & response time */
     LOG_PRINT("\r\n[INTERRUPT LATENCY & RESPONSE TIME]\r\n");
-    LOG_PRINT("  IRQ latency  avg        : %lu us\r\n",
+    LOG_PRINT("  IRQ latency  avg        : %u us\r\n",
               r->latency.irq_latency_us.avg);
-    LOG_PRINT("  IRQ latency  min        : %lu us\r\n",
+    LOG_PRINT("  IRQ latency  min        : %u us\r\n",
               r->latency.irq_latency_us.min);
-    LOG_PRINT("  IRQ latency  max        : %lu us\r\n",
+    LOG_PRINT("  IRQ latency  max        : %u us\r\n",
               r->latency.irq_latency_us.max);
-    LOG_PRINT("  IRQ latency  jitter     : %lu us\r\n",
+    LOG_PRINT("  IRQ latency  jitter     : %u us\r\n",
               r->latency.irq_latency_us.jitter);
-    LOG_PRINT("  IRQ -> task  avg        : %lu us\r\n",
+    LOG_PRINT("  IRQ -> task  avg        : %u us\r\n",
               r->latency.irq_to_task_us.avg);
-    LOG_PRINT("  IRQ -> task  jitter     : %lu us\r\n",
+    LOG_PRINT("  IRQ -> task  jitter     : %u us\r\n",
               r->latency.irq_to_task_us.jitter);
-    LOG_PRINT("  Latency under load avg  : %lu us\r\n",
+    LOG_PRINT("  Latency under load avg  : %u us\r\n",
               r->latency.load_latency_us.avg);
 
     /* Scheduling efficiency & context switch */
     LOG_PRINT("\r\n[SCHEDULING EFFICIENCY & CONTEXT SWITCH]\r\n");
-    LOG_PRINT("  Context switch avg      : %lu us\r\n",
+    LOG_PRINT("  Context switch avg      : %u us\r\n",
               r->latency.ctx_switch_us.avg);
-    LOG_PRINT("  Context switch min      : %lu us\r\n",
+    LOG_PRINT("  Context switch min      : %u us\r\n",
               r->latency.ctx_switch_us.min);
-    LOG_PRINT("  Context switch jitter   : %lu us\r\n",
+    LOG_PRINT("  Context switch jitter   : %u us\r\n",
               r->latency.ctx_switch_us.jitter);
-    LOG_PRINT("  Deadline misses         : %lu / %lu  (%.2f %%)\r\n",
+    LOG_PRINT("  Deadline misses         : %u / %u  (%.2f %%)\r\n",
               r->sched.deadline_misses,
               r->sched.deadline_total,
-              r->sched.miss_rate_pct);
-    LOG_PRINT("  Priority inversions     : %lu\r\n",
+              (double)r->sched.miss_rate_pct);
+    LOG_PRINT("  Priority inversions     : %u\r\n",
               r->sched.priority_inversion_cnt);
-    LOG_PRINT("  Max concurrent tasks    : %lu\r\n",
+    LOG_PRINT("  Max concurrent tasks    : %u\r\n",
               r->sched.max_tasks_created);
     LOG_PRINT("  Task failure rate       : %.2f %%\r\n",
-              r->sched.task_failure_rate_pct);
+              (double)r->sched.task_failure_rate_pct);
 
     /* I/O throughput & filesystem */
     LOG_PRINT("\r\n[I/O THROUGHPUT & FILESYSTEM]\r\n");
-    LOG_PRINT("  UART throughput         : %lu KB/s\r\n",
+    LOG_PRINT("  UART throughput         : %u KB/s\r\n",
               r->io.uart_throughput_kbps);
     LOG_PRINT("  UART packet loss        : %.2f %%\r\n",
-              r->io.uart_packet_loss_pct);
-    LOG_PRINT("  FS write throughput     : %lu KB/s\r\n",
+              (double)r->io.uart_packet_loss_pct);
+    LOG_PRINT("  FS write throughput     : %u KB/s\r\n",
               r->io.fs_write_kbps);
-    LOG_PRINT("  FS read  throughput     : %lu KB/s\r\n",
+    LOG_PRINT("  FS read  throughput     : %u KB/s\r\n",
               r->io.fs_read_kbps);
-    LOG_PRINT("  FS sync latency         : %lu us\r\n",
+    LOG_PRINT("  FS sync latency         : %u us\r\n",
               r->io.fs_sync_us);
 
     /* Long-term stability */
     LOG_PRINT("\r\n[LONG-TERM STABILITY]\r\n");
-    LOG_PRINT("  Uptime                  : %lu hrs\r\n",
+    LOG_PRINT("  Uptime                  : %u hrs\r\n",
               r->stability.uptime_hrs);
-    LOG_PRINT("  Stress failures         : %lu\r\n",
+    LOG_PRINT("  Stress failures         : %u\r\n",
               r->stability.stress_fail_count);
-    LOG_PRINT("  HF IRQ rate             : %lu Hz\r\n",
+    LOG_PRINT("  HF IRQ rate             : %u Hz\r\n",
               r->stability.stress_irq_rate_hz);
 
     /* Workload simulation */
     LOG_PRINT("\r\n[WORKLOAD SIMULATION]\r\n");
-    LOG_PRINT("  Sensor: missed/total    : %lu / %lu  (%.2f %%)\r\n",
+    LOG_PRINT("  Sensor: missed/total    : %u / %u  (%.2f %%)\r\n",
               r->workload.sensor_missed_samples,
               r->workload.sensor_samples_total,
-              r->workload.sensor_miss_rate_pct);
-    LOG_PRINT("  Net: sent/lost          : %lu / %lu  (%.2f %%)\r\n",
+              (double)r->workload.sensor_miss_rate_pct);
+    LOG_PRINT("  Net: sent/lost          : %u / %u  (%.2f %%)\r\n",
               r->workload.net_msgs_sent,
               r->workload.net_msgs_lost,
-              r->workload.net_loss_pct);
-    LOG_PRINT("  Concurrent tasks run    : %lu\r\n",
+              (double)r->workload.net_loss_pct);
+    LOG_PRINT("  Concurrent tasks run    : %u\r\n",
               r->workload.concurrent_tasks_run);
-    LOG_PRINT("  HF IRQ count / missed   : %lu / %lu\r\n",
+    LOG_PRINT("  HF IRQ count / missed   : %u / %u\r\n",
               r->workload.hf_irq_count,
               r->workload.hf_irq_miss_count);
     LOG_PRINT("\r\n");
@@ -189,24 +189,24 @@ void bench_log_csv_header(void) {
  *  CSV data row — one call per run
  * ═══════════════════════════════════════════════════════════════════*/
 void bench_log_csv_row(const bench_results_t *r) {
-    LOG_PRINT("%s,%lu,"
-              "%lu,%lu,"
+    LOG_PRINT("%s,%u,"
+              "%u,%u,"
               "%.2f,%.2f,"
-              "%lu,%lu,"
-              "%lu,%lu,%lu,"
-              "%lu,%lu,%lu,%lu,"
-              "%lu,%lu,"
-              "%lu,%lu,"
-              "%lu,"
-              "%.2f,%lu,%lu,%.2f,"
-              "%lu,%.2f,"
-              "%lu,%lu,%lu,"
-              "%lu,%lu,"
-              "%.2f,%.2f,%lu,%lu"
+              "%u,%u,"
+              "%u,%u,%u,"
+              "%u,%u,%u,%u,"
+              "%u,%u,"
+              "%u,%u,"
+              "%u,"
+              "%.2f,%u,%u,%.2f,"
+              "%u,%.2f,"
+              "%u,%u,%u,"
+              "%u,%u,"
+              "%.2f,%.2f,%u,%u"
               "\r\n",
               r->platform, r->run_index,
               r->boot_time_ms, r->stability.recovery_ms,
-              r->cpu.idle_pct, r->cpu.load_pct,
+              (double)r->cpu.idle_pct, (double)r->cpu.load_pct,
               STATIC_TEXT_BYTES, STATIC_DATA_BYTES,
               r->mem.heap_used_bytes, r->mem.heap_free_bytes,
               r->mem.footprint_kb,
@@ -219,19 +219,19 @@ void bench_log_csv_row(const bench_results_t *r) {
               r->latency.ctx_switch_us.avg,
               r->latency.ctx_switch_us.jitter,
               r->latency.load_latency_us.avg,
-              r->sched.miss_rate_pct,
+              (double)r->sched.miss_rate_pct,
               r->sched.priority_inversion_cnt,
               r->sched.max_tasks_created,
-              r->sched.task_failure_rate_pct,
+              (double)r->sched.task_failure_rate_pct,
               r->io.uart_throughput_kbps,
-              r->io.uart_packet_loss_pct,
+              (double)r->io.uart_packet_loss_pct,
               r->io.fs_write_kbps,
               r->io.fs_read_kbps,
               r->io.fs_sync_us,
               r->stability.uptime_hrs,
               r->stability.stress_fail_count,
-              r->workload.sensor_miss_rate_pct,
-              r->workload.net_loss_pct,
+              (double)r->workload.sensor_miss_rate_pct,
+              (double)r->workload.net_loss_pct,
               r->workload.hf_irq_count,
               r->workload.hf_irq_miss_count);
 }
@@ -249,5 +249,5 @@ void bench_trace_event(const char *event, const char *task, uint32_t pri) {
 #elif defined(ZEPHYR)
     uint32_t ts = (uint32_t)k_uptime_get() * 1000U;
 #endif
-    LOG_PRINT("[TRACE] %lu %s %s %lu\r\n", ts, event, task, pri);
+    LOG_PRINT("[TRACE] %u %s %s %u\r\n", ts, event, task, pri);
 }

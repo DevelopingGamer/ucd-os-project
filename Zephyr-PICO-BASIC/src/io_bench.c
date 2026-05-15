@@ -150,27 +150,28 @@ io_stats_t io_bench_run(void) {
     for (uint32_t i = 0; i < IO_BUF_SIZE; i++) _tx_buf[i] = (uint8_t)(i & 0xFF);
     //Get the current time
     uint32_t t0 = (uint32_t)k_uptime_get();
+    
     for (uint32_t i = 0; i < IO_ITERATIONS; i++) {
-        for (uint32_t b = 0; b < IO_BUF_SIZE; b++)
-            //Send all data in buffer out through uart
-            uart_poll_out(uart, _tx_buf[b]);
-        //Initialize received bytes to 0
         int received = 0;
-        //Set the deadline to 50 milliseconds from the current time 
-        uint32_t deadline = (uint32_t)k_uptime_get() + 50U;
-        //Recieve bytes until all bytes are received or the deadline expires
-        while (received < (int)IO_BUF_SIZE &&
-               (uint32_t)k_uptime_get() < deadline) {
-            //Initialize c as a byte
+        uint32_t deadline = (uint32_t)k_uptime_get() + 250U;
+        
+        //Send and receive byte-by-byte to prevent 32-byte FIFO overflow
+        for (uint32_t b = 0; b < IO_BUF_SIZE; b++) {
+            uart_poll_out(uart, _tx_buf[b]);
+            
             uint8_t c;
-            //If a byte is found (meaning uart_poll_in returned 0
-            // then put that byte into the rx buffer and increment the received as the
-            // rx buffer list index)
-            if (uart_poll_in(uart, &c) == 0)
+            //Wait for single bit to arrive
+            while (uart_poll_in(uart, &c) != 0) {
+                if ((uint32_t)k_uptime_get() >= deadline) break;
+            }
+            
+            //If save if bit obtained before the deadline
+            if ((uint32_t)k_uptime_get() < deadline) {
                 _rx_buf[received++] = c;
+            }
         }
-        //If the recieved bytes are less than the buffer size increment loss,
-        // otherwise add the buffer size to total bytes
+        //Iterate lost packages if data is incomplete, otherwise add
+        // bytes obtained
         if (received != (int)IO_BUF_SIZE) lost++;
         else total_bytes += IO_BUF_SIZE;
     }
