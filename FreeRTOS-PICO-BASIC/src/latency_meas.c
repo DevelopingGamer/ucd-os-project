@@ -138,7 +138,7 @@ latency_results_t latency_measure_all(void) {
         timeout++;
     }
     if (timeout >= 2000) {
-        printf("Time out occured during Latency Test\n");
+        printf("Time out occurred during Latency Test\n");
     }
 
     //Initialize struct and all values in the struct (to 0 except min which is set
@@ -194,7 +194,7 @@ latency_results_t latency_measure_all(void) {
         timeout++;
     }
     if (timeout >= 2000) {
-        printf("Time out occured during Latency Test\n");
+        printf("Time out occurred during Latency Test\n");
     }
 
 

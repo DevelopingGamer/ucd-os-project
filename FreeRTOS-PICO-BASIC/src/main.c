@@ -1,3 +1,4 @@
+//Compile by starting in build directory, then run cmake .. and then make -j4
 #include "benchmark_common.h"
 #include "bench_log.h"
 #include "boot_recovery.h"
@@ -12,7 +13,7 @@
 #include "hardware/irq.h"
 
 //Define the number of times the benchmark tests should be ran
-#define TOTAL_BENCHMARK_RUNS 1000
+#define TOTAL_BENCHMARK_RUNS 250
 
 #if defined(FREERTOS_PICO)
 //Include the pico's stdlib for printf, timers and delays,
@@ -45,7 +46,7 @@ void bench_run_all(bench_results_t *out, uint32_t run_idx) {
     out->stability.recovery_ms = boot_measure_recovery_ms(false);
 
     //Run latency_meas.c
-    //Does not work alongside fs_bench.c
+    //Does not work alongside fs_bench.c in FreeRTOS
     //out->latency = latency_measure_all();
 
     //Run io_bench.c
@@ -54,7 +55,7 @@ void bench_run_all(bench_results_t *out, uint32_t run_idx) {
     out->io.uart_packet_loss_pct = io_res.packet_loss_pct;
 
     //Run fs_bench.c
-    //Does not work alongside latency_meas.c
+    //Does not work alongside latency_meas.c in FreeRTOS
     fs_stats_t fs_res = fs_bench_run();
     out->io.fs_write_kbps = fs_res.fs_write_kbps;
     out->io.fs_read_kbps  = fs_res.fs_read_kbps;
@@ -115,7 +116,7 @@ static void main_task(void *arg) {
                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
             
         printf("Attempting to connect to Wi-Fi\n");
-        cyw43_arch_wifi_connect_async("PicoTest", "7i59e9j6gusk825", CYW43_AUTH_WPA2_AES_PSK);
+        cyw43_arch_wifi_connect_async("PicoTest", "8wQ9h0T63fhet910", CYW43_AUTH_WPA2_AES_PSK);
         
         int retry_limit = 2000; 
         while(retry_limit > 0) {
@@ -156,8 +157,8 @@ int main(void) {
     // Initialize standard IO hardware
     stdio_init_all();
     
-    // Give the USB Serial Monitor 2 seconds to establish a connection to the PC
-    sleep_ms(2000); 
+    // Give the USB Serial Monitor 600 milliseconds to establish a connection to the PC
+    sleep_ms(600); 
     printf("\nBooting Pico 2W...\n");
     //Ensure crash is happening during FreeRTOS kernel startup during applicable
     // debugging situation
