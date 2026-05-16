@@ -203,7 +203,7 @@ int memory_footprint(void)
 }
 
 int main(void) {
-    uint32_t test_runs = 5;
+    uint32_t test_runs = 500;
 
     uint32_t average_boot_times = boot_times(test_runs);
 
@@ -211,15 +211,11 @@ int main(void) {
     
     ztimer_sleep(ZTIMER_MSEC, 2000);
 
-    memory_footprint();
-
     printf("Allocating test memory block...\n");
     char *test_buffer = malloc(2048);
     if (test_buffer) {
         snprintf(test_buffer, 2048, "Simulated data payload string.");
     }
-
-    memory_footprint();
 
     free(test_buffer);
 
@@ -230,7 +226,7 @@ int main(void) {
     
     for (uint32_t i=0; i<test_runs; i++) {
         cumulative_recovery += sleep_recovery();
-        cumulative_memory = memory_footprint();
+        cumulative_memory += memory_footprint();
         int* ptr = cpu_load();
         cumulative_cpu_percent += ptr[0];
         cumulative_cpu_fraction += ptr[1];
