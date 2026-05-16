@@ -8,7 +8,7 @@ uint32_t boot_start = 0;
 uint32_t boot_time = 0;
 
 //Create list of 1000 samples to compute averages
-#define NUM_SAMPLES 1000
+#define NUM_SAMPLES 500
 volatile int64_t light_times[NUM_SAMPLES];
 volatile int64_t heavy_times[NUM_SAMPLES];
 volatile int64_t task_iot_times[NUM_SAMPLES];
