@@ -1,4 +1,4 @@
-//west build -p always -b rpi_pico2/rp2350a/m33/w
+//in src: west build -p always -b rpi_pico2/rp2350a/m33/w
 #include "benchmark_common.h"
 #include "bench_log.h"
 #include "boot_recovery.h"

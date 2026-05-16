@@ -2,6 +2,10 @@
 #include "mem_profile.h"
 
 #if defined(FREERTOS_PICO)
+extern char __bss_start__[];
+extern char __bss_end__[];
+extern char __data_start__[];
+extern char __data_end__[];
 
 mem_results_t mem_profile_collect(void) {
     //Initialize the metrics struct to all 0's
@@ -24,8 +28,21 @@ mem_results_t mem_profile_collect(void) {
     // never been used
     r.task_stack_hwm_bytes = uxTaskGetStackHighWaterMark(NULL)
                              * sizeof(StackType_t);
-    //Get heap_used_bytes in kilobytes
-    r.footprint_kb         = (r.heap_used_bytes + 512U) / 1024U;
+
+    //Caluclate Static Memory Usage
+    uint32_t static_bss  = (uint32_t)__bss_end__  - (uint32_t)__bss_start__;
+    uint32_t static_data = (uint32_t)__data_end__ - (uint32_t)__data_start__;
+    uint32_t total_static_ram = static_bss + static_data;
+    //Get total usage
+    uint32_t active_ram_bytes;
+    //Find if the heap is a part of the BSS allocation and run accordingly
+    if (total_static_ram >= r.heap_total_bytes) {
+        active_ram_bytes = (total_static_ram - r.heap_total_bytes) + r.heap_used_bytes;
+    } else {
+        active_ram_bytes = total_static_ram + r.heap_used_bytes;
+    }
+    //Convert to kilobytes
+    r.footprint_kb         = (r.active_ram_bytes + 512U) / 1024U;
     //Return the struct
     return r;
 }
