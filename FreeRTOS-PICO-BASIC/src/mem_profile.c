@@ -2,6 +2,10 @@
 #include "mem_profile.h"
 
 #if defined(FREERTOS_PICO)
+extern char __bss_start__[];
+extern char __bss_end__[];
+extern char __data_start__[];
+extern char __data_end__[];
 
 mem_results_t mem_profile_collect(void) {
     //Initialize the metrics struct to all 0's
@@ -24,8 +28,15 @@ mem_results_t mem_profile_collect(void) {
     // never been used
     r.task_stack_hwm_bytes = uxTaskGetStackHighWaterMark(NULL)
                              * sizeof(StackType_t);
-    //Get heap_used_bytes in kilobytes
-    r.footprint_kb         = (r.heap_used_bytes + 512U) / 1024U;
+
+    //Caluclate Static Memory Usage
+    uint32_t static_bss  = (uint32_t)__bss_end__  - (uint32_t)__bss_start__;
+    uint32_t static_data = (uint32_t)__data_end__ - (uint32_t)__data_start__;
+    uint32_t total_static_ram = static_bss + static_data;
+    //Get total usage
+    uint32_t active_ram_bytes = (total_static_ram - r.heap_total_bytes) + r.heap_used_bytes;
+    //Convert to kilobytes
+    r.footprint_kb         = (active_ram_bytes + 512U) / 1024U;
     //Return the struct
     return r;
 }
@@ -46,7 +57,7 @@ mem_results_t mem_profile_collect(void) {
     // and if it's currently active add its stack size to the used counter
     for (int i = 0; i < MAXTHREADS; i++) {
         thread_t *t = (thread_t *)sched_threads[i];
-        if (t) used += CONFIG_THREAD_STACKSIZE_DEFAULT;
+        if (t) used += THREAD_STACKSIZE_DEFAULT;
     }
     //Record the amount of stack memory used by each thread and get the
     // difference between the total heap allocate and stack memory usage
@@ -64,7 +75,13 @@ mem_results_t mem_profile_collect(void) {
 
 #elif defined(ZEPHYR)
 #include <zephyr/sys/sys_heap.h>
-//Get the heap tracker managed by the Zephyr kernel
+//Get standard Zephyr linker symbols for RAM tracking
+extern char __bss_start[];
+extern char __bss_end[];
+extern char __data_region_start[];
+extern char __data_region_end[];
+
+// Get the heap tracker managed by the Zephyr kernel
 extern struct sys_heap _system_heap;
 
 mem_results_t mem_profile_collect(void) {
@@ -74,22 +91,24 @@ mem_results_t mem_profile_collect(void) {
     // zephyr/sys/sys_heap.h) to store allocated_bytes, free_bytes, and
     // max_allocated bytes
     struct sys_memory_stats hs;
-    //Get heap information and put it in hs struct
+    //Get dynamic heap usage
     sys_heap_runtime_stats_get(&_system_heap, &hs);
-    //Get used bytes and free bytes
+    
     r.heap_used_bytes      = (uint32_t)hs.allocated_bytes;
     r.heap_free_bytes      = (uint32_t)hs.free_bytes;
-    //Calculate total bytes and the minimum ever free bytes
     r.heap_total_bytes     = (uint32_t)(hs.allocated_bytes + hs.free_bytes);
-    r.heap_min_ever_free   = r.heap_total_bytes
-                             - (uint32_t)hs.max_allocated_bytes;
-    //Get the number of bytes in the current thread's stack that is currently
-    // unused
-    r.task_stack_hwm_bytes = (uint32_t)k_thread_stack_space_get(
-                                 k_current_get());
-    //Get heap_used_bytes in kilobytes
-    r.footprint_kb         = (r.heap_used_bytes + 512U) / 1024U;
-    //Return the struct
+    r.heap_min_ever_free   = r.heap_total_bytes - (uint32_t)hs.max_allocated_bytes;
+
+    //Calculate static RAM usage
+    uint32_t static_data = (uint32_t)__data_region_end - (uint32_t)__data_region_start;
+    uint32_t static_bss  = (uint32_t)__bss_end  - (uint32_t)__bss_start;
+    uint32_t total_static_ram = static_data + static_bss;
+
+    //Get the footprint
+    uint32_t active_ram_bytes = (total_static_ram - r.heap_total_bytes) + r.heap_used_bytes;
+
+    //Convert to KB with proper rounding
+    r.footprint_kb = (active_ram_bytes + 512U) / 1024U;
     return r;
 }
 #endif
